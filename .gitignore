@@ -1,0 +1,4 @@
+git add .gitignore
+git commit -m "إضافة ملف التجاهل لتنظيف المستودع"
+git push origin main
+
