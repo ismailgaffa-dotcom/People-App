@@ -3,78 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إسماعيل | الصفحة الشخصية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <title>Ismail AI Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --bg-color: #343541;
+            --sidebar-color: #202123;
+            --text-color: #ececf1;
+            --input-bg: #40414f;
+        }
         body {
-            font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .message {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar {
+            width: 30px;
+            height: 30px;
+            background: #10a37f;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .input-area {
+            padding: 20px;
+            background: linear-gradient(transparent, var(--bg-color));
             display: flex;
             justify-content: center;
+        }
+        .input-box {
+            max-width: 800px;
+            width: 100%;
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 12px 15px;
+            display: flex;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
         }
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            max-width: 400px;
-            width: 90%;
+        input {
+            background: transparent;
+            border: none;
+            color: white;
+            flex: 1;
+            outline: none;
+            font-size: 16px;
         }
-        h1 { margin-bottom: 0.5rem; color: #00d2ff; }
-        p { line-height: 1.6; font-size: 1.1rem; }
-        .btn {
-            display: inline-block;
-            margin-top: 1.5rem;
-            padding: 10px 25px;
-            background: #00d2ff;
-            color: #1e3c72;
+        .btn-social {
+            color: #acacbe;
             text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: 0.3s;
+            margin: 0 10px;
+            font-size: 14px;
         }
-        .btn:hover { transform: scale(1.05); background: #fff; }
+        .btn-social:hover { color: white; }
     </style>
 </head>
 <body>
-    <div class="card">
-<div id="weather-box" style="margin-top: 20px; padding: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-    <p id="temp-text" style="font-size: 0.9rem; color: #94a3b8;">جاري تحميل حالة الطقس... 🌤️</p>
-</div>
 
-<script>
-    async function getTechWeather() {
-        try {
-            // إحداثيات طنجة كمثال
-            const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.76&longitude=-5.80&current_weather=true');
-            const data = await response.json();
-            const temp = data.current_weather.temperature;
-            document.getElementById('temp-text').innerHTML = `درجة الحرارة في طنجة الآن: <span style="color: #00d2ff; font-weight: bold;">${temp}°C</span> 🌡️`;
-        } catch (error) {
-            document.getElementById('temp-text').innerHTML = "تعذر تحميل الطقس حالياً";
-        }
-    }
-    getTechWeather();
-</script>
-
-        <h1>مرحباً بك في عالمي!</h1>
-        <p>أنا إسماعيل، مطور شغوف بالتقنية عبر Termux و GitHub.</p>
-        
-        <a href="https://www.instagram.com/i60ma70il?igsh=MTVqZm8ydTVtd2cwbA==" class="btn">
-            <i class="fab fa-instagram"></i> إنستغرام
-        </a>
-
-        <a href="https://github.com/ismailgaffa-dotcom" class="btn">
-            <i class="fab fa-github"></i> جيت هاب
-        </a>
+    <div class="chat-container">
+        <div class="message">
+            <div class="avatar">I</div>
+            <div class="content">
+                <strong>إسماعيل AI:</strong>
+                <p>مرحباً بك! أنا مطور تقني أستخدم Termux. كيف يمكنني مساعدتك اليوم؟</p>
+                <div id="weather-info">جاري جلب بيانات الطقس...</div>
+            </div>
+        </div>
     </div>
+
+    <div class="input-area">
+        <div class="input-box">
+            <input type="text" placeholder="اسأل إسماعيل عن مشاريعه...">
+            <i class="fas fa-paper-plane" style="color: #acacbe; cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding-bottom: 10px;">
+        <a href="https://instagram.com/i60ma70il" class="btn-social"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="https://github.com/ismailgaffa-dotcom" class="btn-social"><i class="fab fa-github"></i> GitHub</a>
+    </div>
+
+    <script>
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.76&longitude=-5.80&current_weather=true');
+                const data = await res.json();
+                document.getElementById('weather-info').innerHTML = `حالة الطقس الحالية في طنجة هي ${data.current_weather.temperature}°C. هل هناك شيء آخر تود معرفته؟`;
+            } catch (e) {
+                document.getElementById('weather-info').innerHTML = "معلومات الطقس غير متاحة حالياً.";
+            }
+        }
+        fetchWeather();
+    </script>
 </body>
 </html>
 
