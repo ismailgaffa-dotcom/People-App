@@ -3,110 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الطقس AI - نظام الإنذار المبكر</title>
+    <title>الطقس AI - النظام العالمي الموحد</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            margin: 0; font-family: 'Segoe UI', sans-serif;
-            background: #0e1621; color: white;
-            background-image: url('https://www.transparenttextures.com/patterns/shattered.png');
-            height: 100vh; display: flex; flex-direction: column;
-        }
-        .header {
-            background: #242f3d; padding: 15px; display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5); border-bottom: 1px solid #2b5278;
-        }
-        .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 15px; line-height: 1.6; font-size: 15px; }
-        .ai { background: #2b5278; align-self: flex-start; border-bottom-right-radius: 2px; }
-        .user { background: #182533; align-self: flex-end; border-bottom-left-radius: 2px; color: #8295ad; }
-        
-        .report-card { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; margin-top: 10px; border-right: 4px solid #64b5f6; }
-        .warning { color: #ff5252; font-weight: bold; background: rgba(255,82,82,0.1); padding: 8px; border-radius: 5px; margin-top: 10px; border: 1px dashed #ff5252; animation: blink 1.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.6; } }
-
-        .input-area { background: #242f3d; padding: 15px; display: flex; gap: 10px; }
-        input { flex: 1; background: #17212b; border: 1px solid #2f3b4a; border-radius: 25px; padding: 12px 20px; color: white; outline: none; }
-        button { background: #5288c1; border: none; color: white; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #64b5f6; transform: scale(1.1); }
+        :root { --tg-bg: #0e1621; --tg-sent: #2b5278; --tg-accent: #64b5f6; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--tg-bg); color: white; height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #242f3d; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 2px solid var(--tg-sent); }
+        .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background-image: url('https://www.transparenttextures.com/patterns/skulls.png'); }
+        .msg { max-width: 85%; padding: 15px; border-radius: 18px; line-height: 1.6; }
+        .ai { background: var(--tg-sent); align-self: flex-start; border-bottom-right-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
+        .user { background: #182533; align-self: flex-end; border-bottom-left-radius: 4px; color: #a8b2bd; }
+        .report-card { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; margin-top: 10px; border-left: 5px solid var(--tg-accent); }
+        .warning-red { color: #ff5252; background: rgba(255,82,82,0.1); padding: 10px; border-radius: 8px; border: 1px solid #ff5252; margin-top: 10px; font-weight: bold; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
+        .input-bar { background: #242f3d; padding: 15px; display: flex; gap: 10px; }
+        input { flex: 1; background: #17212b; border: 1px solid #2f3b4a; border-radius: 25px; padding: 12px 20px; color: white; outline: none; font-size: 16px; }
+        button { background: var(--tg-accent); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div style="width:45px; height:45px; border-radius:50%; background:linear-gradient(45deg, #2b5278, #64b5f6); display:flex; align-items:center; justify-content:center; font-size:20px;">🛰️</div>
-        <div>
-            <div style="font-weight: bold;">الطقس AI</div>
-            <div style="font-size: 12px; color: #8295ad;">نظام الإنذار العالمي المتصل</div>
-        </div>
+<div class="header">
+    <div style="width:45px; height:45px; border-radius:50%; background:linear-gradient(45deg, #10a37f, #64b5f6); display:flex; align-items:center; justify-content:center; font-size:22px;">🌐</div>
+    <div>
+        <div style="font-weight: bold;">الطقس AI (الإصدار العالمي)</div>
+        <div id="liveClock" style="font-size: 12px; color: var(--tg-accent);">جاري مزامنة الوقت...</div>
     </div>
+</div>
 
-    <div class="chat-container" id="chat">
-        <div class="bubble ai">
-            مرحباً بك في نظام <b>الطقس AI</b> المتطور. ⛈️
-            <br>أنا هنا لتحليل مخاطر الفيضانات، سرعة الرياح، والتقلبات الجوية المفاجئة.
-            <br>اكتب اسم المدينة لبدء الفحص:
-        </div>
-    </div>
+<div class="chat-area" id="chat">
+    <div class="msg ai">مرحباً بك في النظام الموحد. لقد قمت ببرمجة هذا الـ AI ليعطيك نتائج ثابتة واحترافية لأي مدينة في العالم. <br><b>أدخل اسم المدينة (مثلاً: الدار البيضاء، لندن، دبي):</b></div>
+</div>
 
-    <div class="input-area">
-        <input type="text" id="cityInput" placeholder="أدخل اسم المدينة (مثلاً: طنجة، باريس)..." onkeypress="if(event.key === 'Enter') startAnalysis()">
-        <button onclick="startAnalysis()"><i class="fas fa-paper-plane"></i></button>
-    </div>
+<div class="input-bar">
+    <input type="text" id="cityInput" placeholder="ابحث عن أي مدينة في العالم..." onkeypress="if(event.key === 'Enter') processWeather()">
+    <button onclick="processWeather()"><i class="fas fa-paper-plane"></i></button>
+</div>
 
-    <script>
-        async function startAnalysis() {
-            const input = document.getElementById('cityInput');
-            const city = input.value.trim();
-            if(!city) return;
+<script>
+    // تحديث الساعة الحية في الهيدر
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = `التوقيت الحالي: ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+    }
+    setInterval(updateClock, 1000);
 
-            addMsg('user', city);
-            input.value = '';
+    async function processWeather() {
+        const input = document.getElementById('cityInput');
+        const city = input.value.trim();
+        if(!city) return;
 
-            try {
-                const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=ar`);
-                const geoData = await geo.json();
-                if(!geoData.results) { addMsg('ai', '⚠️ تعذر تحديد موقع المدينة، يرجى التأكد من الاسم.'); return; }
+        addMsg('user', city);
+        input.value = '';
 
-                const {latitude, longitude, name, country} = geoData.results[0];
-                const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&timezone=auto`);
-                const data = await weather.json();
+        try {
+            // جلب الإحداثيات الموحدة (Snap to Center)
+            const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=ar`);
+            const geoData = await geoRes.json();
+            if(!geoData.results) { addMsg('ai', '⚠️ لم أستطع العثور على هذه المدينة في الخارطة العالمية.'); return; }
 
-                const temp = data.current_weather.temperature;
-                const wind = data.current_weather.windspeed;
-                const rain = data.hourly.precipitation_probability[0];
-                const humidity = data.hourly.relativehumidity_2m[0];
+            // تثبيت الإحداثيات (تقريب لخانة واحدة لضمان الثبات)
+            const lat = Math.round(geoData.results[0].latitude * 10) / 10;
+            const lon = Math.round(geoData.results[0].longitude * 10) / 10;
+            const cityName = geoData.results[0].name;
+            const country = geoData.results[0].country;
 
-                let report = `<b>التقرير الفني لمدينة ${name} (${country}):</b><br>`;
-                report += `<div class="report-card">`;
-                report += `🌡️ الحرارة: ${temp}°C<br>`;
-                report += `💨 سرعة الرياح: ${wind} كم/س<br>`;
-                report += `💧 الرطوبة: ${humidity}%<br>`;
-                report += `☔ احتمالية الأمطار: ${rain}%`;
-                report += `</div>`;
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=precipitation_probability,surface_pressure&timezone=auto`);
+            const wData = await weatherRes.json();
 
-                // ذكاء اصطناعي للتحذيرات
-                let warnings = "";
-                if(wind > 55) warnings += `<div class="warning">📢 إنذار: رياح عاتية متوقعة! يرجى الحذر.</div>`;
-                if(rain > 75) warnings += `<div class="warning">⚠️ تحذير: خطر فيضانات محتمل نتيجة أمطار غزيرة!</div>`;
-                if(temp > 40) warnings += `<div class="warning">🔥 تنبيه: موجة حر شديدة، تجنب التعرض للشمس.</div>`;
-                
-                if(!warnings) report += `<br>✅ النشرة: الأجواء مستقرة حالياً ولا توجد مخاطر محتملة.`;
-                else report += warnings;
+            const temp = wData.current_weather.temperature;
+            const wind = wData.current_weather.windspeed;
+            const rain = wData.hourly.precipitation_probability[0];
+            const pressure = wData.hourly.surface_pressure[0];
 
-                addMsg('ai', report);
-            } catch (e) { addMsg('ai', '❌ فشل الاتصال بخادم الأرصاد الجوية.'); }
-        }
+            let report = `<b>التقرير العالمي الموحد لـ ${cityName} (${country}):</b><br>`;
+            report += `<div class="report-card">`;
+            report += `🌡️ الحرارة الموحدة: ${temp}°C<br>`;
+            report += `💨 سرعة الرياح: ${wind} كم/س<br>`;
+            report += `☔ احتمال الأمطار: ${rain}%<br>`;
+            report += `⏲️ الضغط الجوي: ${pressure} hPa`;
+            report += `</div>`;
 
-        function addMsg(type, text) {
-            const chat = document.getElementById('chat');
-            const div = document.createElement('div');
-            div.className = `bubble ${type}`;
-            div.innerHTML = text;
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
-    </script>
+            // تحليل "ناضي" للمخاطر
+            if(rain > 75 && pressure < 1000) {
+                report += `<div class="warning-red">🚨 إنذار أحمر: احتمالية فيضانات عالية نتيجة انخفاض الضغط الجوي!</div>`;
+            } else if(wind > 50) {
+                report += `<div class="warning-red">🌪️ تحذير: رياح قوية قد تؤثر على الحركة!</div>`;
+            } else {
+                report += `<p style="color:#81c784; margin-top:10px;">✅ حالة الطقس مستقرة وآمنة في هذه الإحداثيات.</p>`;
+            }
+
+            addMsg('ai', report);
+        } catch(e) { addMsg('ai', '❌ حدث خطأ في النظام العالمي، حاول مرة أخرى.'); }
+    }
+
+    function addMsg(type, text) {
+        const chat = document.getElementById('chat');
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        div.innerHTML = text;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    }
+</script>
 </body>
 </html>
 
