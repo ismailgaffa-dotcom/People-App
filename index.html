@@ -3,86 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ismail AI - Weather Expert</title>
+    <title>الطقس AI - خبير الأرصاد الذكي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg-color: #343541; --sidebar-color: #202123; --text-color: #ececf1; --input-bg: #40414f; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
-        .message { max-width: 800px; width: 100%; margin: 0 auto; padding: 20px; display: flex; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); animation: fadeIn 0.5s; }
-        .avatar { width: 30px; height: 30px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .ai-avatar { background: #10a37f; }
-        .user-avatar { background: #5436da; }
-        .input-area { padding: 20px; background: linear-gradient(transparent, var(--bg-color)); display: flex; flex-direction: column; align-items: center; }
-        .input-box { max-width: 800px; width: 100%; background: var(--input-bg); border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        input { background: transparent; border: none; color: white; flex: 1; outline: none; font-size: 16px; padding: 0 10px; }
-        button { background: transparent; border: none; color: #10a37f; cursor: pointer; font-size: 18px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0e1621; /* لون تيليجرام الليلي */
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            height: 100vh; display: flex; flex-direction: column;
+        }
+        /* Header - شريط علوي مثل تيليجرام */
+        .header {
+            background: #242f3d; color: white; padding: 10px 20px;
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .header img { width: 40px; height: 40px; border-radius: 50%; background: #10a37f; }
+
+        .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* فقاعات الدردشة */
+        .msg { max-width: 80%; padding: 12px 18px; border-radius: 15px; position: relative; line-height: 1.6; }
+        .ai-msg { background: #2b5278; color: white; align-self: flex-start; border-bottom-right-radius: 2px; }
+        .user-msg { background: #182533; color: #8295ad; align-self: flex-end; border-bottom-left-radius: 2px; }
+
+        .weather-card { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px; margin-top: 10px; border-right: 3px solid #64b5f6; }
+        .warning { color: #ff5252; font-weight: bold; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* منطقة الإدخال */
+        .input-container { background: #242f3d; padding: 15px; display: flex; gap: 10px; }
+        input { flex: 1; background: #17212b; border: none; border-radius: 20px; padding: 12px 20px; color: white; outline: none; }
+        button { background: #5288c1; border: none; color: white; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="chat-container" id="chatHistory">
-        <div class="message">
-            <div class="avatar ai-avatar">I</div>
-            <div class="content"><strong>إسماعيل AI:</strong> <p>أنا خبير طقس عالمي. اكتب اسم أي مدينة في العالم وسأخبرك بحال الطقس فيها فوراً!</p></div>
+    <div class="header">
+        <div class="avatar-icon" style="width:40px; height:40px; border-radius:50%; background:#5288c1; display:flex; align-items:center; justify-content:center; font-weight:bold;">W</div>
+        <div>
+            <div style="font-weight: bold;">الطقس AI</div>
+            <div style="font-size: 12px; color: #8295ad;">متصل الآن - خبير الأرصاد</div>
         </div>
     </div>
 
-    <div class="input-area">
-        <div class="input-box">
-            <input type="text" id="userInput" placeholder="اكتب اسم المدينة هنا (مثلاً: طنجة، باريس، مكة)..." onkeypress="if(event.key === 'Enter') askAI()">
-            <button onclick="askAI()"><i class="fas fa-paper-plane"></i></button>
+    <div class="chat-area" id="chat">
+        <div class="msg ai-msg">
+            مرحباً بك في <b>الطقس AI</b> ⛈️.
+            أنا هنا لأعطيك تقريراً شاملاً (الحرارة، الرياح، الرطوبة، والإنذارات).
+            اكتب اسم المدينة الآن:
         </div>
-        <p style="font-size: 12px; color: #acacbe; margin-top: 10px;">إسماعيل AI يمكنه البحث في أي مكان في العالم.</p>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="cityInput" placeholder="اكتب المدينة..." onkeypress="if(event.key === 'Enter') getAdvancedWeather()">
+        <button onclick="getAdvancedWeather()"><i class="fas fa-paper-plane"></i></button>
     </div>
 
     <script>
-        async function askAI() {
-            const input = document.getElementById('userInput');
+        async function getAdvancedWeather() {
+            const input = document.getElementById('cityInput');
             const city = input.value.trim();
-            if (!city) return;
+            if(!city) return;
 
-            // إضافة رسالة المستخدم للشاشة
-            appendMessage('user', city);
+            addMsg('user', city);
             input.value = '';
 
             try {
-                // 1. البحث عن إحداثيات المدينة
-                const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=ar`);
-                const geoData = await geoRes.json();
+                const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=ar`);
+                const geoData = await geo.json();
+                if(!geoData.results) { addMsg('ai', 'لم أستطع تحديد موقع هذه المدينة، حاول مرة أخرى.'); return; }
 
-                if (!geoData.results) {
-                    appendMessage('ai', `عذراً، لم أستطع العثور على مدينة بهذا الاسم. تأكد من الكتابة بشكل صحيح.`);
-                    return;
-                }
+                const {latitude, longitude, name} = geoData.results[0];
+                const w = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m,precipitation_probability`);
+                const wData = await w.json();
 
-                const { latitude, longitude, name, country } = geoData.results[0];
-
-                // 2. جلب الطقس باستخدام الإحداثيات
-                const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
-                const weatherData = await weatherRes.json();
-                const temp = weatherData.current_weather.temperature;
-
-                appendMessage('ai', `الطقس في ${name} (${country}) حالياً هو ${temp}°C. هل تود معرفة مدينة أخرى؟`);
+                const temp = wData.current_weather.temperature;
+                const wind = wData.current_weather.windspeed;
+                const rainProb = wData.hourly.precipitation_probability[0];
                 
-            } catch (error) {
-                appendMessage('ai', "حدث خطأ أثناء الاتصال بالخادم. حاول مرة أخرى.");
-            }
+                let report = `تحليل الطقس لمدينة <b>${name}</b>: <br><br>`;
+                report += `🌡️ الحرارة: ${temp}°C <br>`;
+                report += `💨 سرعة الرياح: ${wind} كم/س <br>`;
+                report += `☔ احتمالية الأمطار: ${rainProb}% <br>`;
+
+                // نظام الإنذارات الذكي
+                if(wind > 50) report += `<div class="warning">⚠️ تحذير: رياح قوية جداً!</div>`;
+                if(rainProb > 80) report += `<div class="warning">🌊 خطر فيضانات محلي: احتمالية أمطار عالية!</div>`;
+                if(temp > 40) report += `<div class="warning">☀️ تنبيه: موجة حر شديدة!</div>`;
+                
+                if(wind <= 50 && rainProb <= 80 && temp <= 40) report += `<br>✅ الأجواء مستقرة حالياً في ${name}.`;
+
+                addMsg('ai', report);
+            } catch(e) { addMsg('ai', 'عذراً، واجهت مشكلة في الاتصال بالأقمار الصناعية.'); }
         }
 
-        function appendMessage(role, text) {
-            const history = document.getElementById('chatHistory');
-            const msg = document.createElement('div');
-            msg.className = 'message';
-            msg.innerHTML = `
-                <div class="avatar ${role}-avatar">${role === 'ai' ? 'I' : 'U'}</div>
-                <div class="content">
-                    <strong>${role === 'ai' ? 'إسماعيل AI' : 'أنت'}:</strong>
-                    <p>${text}</p>
-                </div>`;
-            history.appendChild(msg);
-            history.scrollTop = history.scrollHeight;
+        function addMsg(type, text) {
+            const chat = document.getElementById('chat');
+            const div = document.createElement('div');
+            div.className = `msg ${type}-msg`;
+            div.innerHTML = text;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
         }
     </script>
 </body>
