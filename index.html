@@ -6,16 +6,29 @@
     <title>People | Social Universe 🦋</title>
     <style>
         :root { --gold: #d4af37; --dark: #1a1a1a; --glass: rgba(255, 255, 255, 0.1); }
-        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* واجهة الدخول الذهبية */
-        #login-screen { position: fixed; inset: 0; background: var(--dark); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-        .login-box { background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); width: 100%; max-width: 300px; text-align: center; }
+        /* شاشة الدخول */
+        #login-screen { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .login-box { background: var(--glass); padding: 30px; border-radius: 20px; border: 1px solid var(--gold); text-align: center; width: 80%; }
         input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 25px; border: 1px solid var(--gold); background: transparent; color: white; text-align: center; }
-        .btn-gold { background: var(--gold); color: black; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: #222; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--gold); }
-        .butterfly { position: fixed; font-size: 24px; pointer-events: none; z-index: 1000; filter: drop-shadow(0 0 5px var(--gold)); transition: all 0.5s ease; }
+        /* الواجهة الرئيسية */
+        .header { text-align: center; color: var(--gold); padding: 10px; border-bottom: 1px solid var(--glass); }
+        .post-card { background: #222; margin: 15px; border-radius: 15px; border: 0.5px solid var(--glass); overflow: hidden; }
+        .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        
+        /* الدردشة */
+        #chat-screen { display: none; padding: 20px; padding-bottom: 100px; }
+        .msg { background: var(--gold); color: black; padding: 10px; border-radius: 15px; margin-bottom: 10px; width: fit-content; }
+        
+        /* الفراشات والنجوم */
+        .butterfly { position: fixed; font-size: 24px; pointer-events: none; z-index: 1000; filter: drop-shadow(0 0 5px var(--gold)); transition: all 1s ease; }
+        .heart-pop { position: absolute; color: var(--gold); animation: pop 0.6s ease-out; pointer-events: none; font-size: 20px; }
+        @keyframes pop { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        .nav { position: fixed; bottom: 0; width: 100%; background: #222; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--gold); z-index: 1500; }
+        .btn-gold { background: var(--gold); color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -23,52 +36,92 @@
 <div id="login-screen">
     <div class="login-box">
         <h2 style="color: var(--gold);">People 🦋</h2>
-        <p>مرحباً بك في عالمك الذهبي</p>
         <input type="text" id="username" placeholder="اسم المستخدم">
         <input type="password" id="password" placeholder="كلمة السر">
-        <button class="btn-gold" onclick="saveLogin()">دخول وحفظ</button>
+        <button class="btn-gold" onclick="saveLogin()">دخول ذهبي</button>
     </div>
 </div>
 
-<div id="app-content" style="display:none;">
-    <h2 style="text-align: center; color: var(--gold);">مرحباً <span id="user-display"></span> 🦋</h2>
-    <div style="text-align: center; padding: 20px;">
-        <p>حسابك الآن محفوظ على هذا الجهاز ✨</p>
-        <button class="btn-gold" onclick="logout()">تسجيل الخروج</button>
+<div id="main-app" style="display:none;">
+    <div class="header">
+        <h2>People | <span id="user-display"></span> 👑</h2>
+    </div>
+
+    <div id="feed">
+        <div class="post-card">
+            <img src="https://via.placeholder.com/400/d4af37/000000?text=Golden+Post" class="post-img" onclick="likePost(event)">
+            <div style="padding:10px;">⭐ اضغط على الصورة لمنح إعجاب ذهبي</div>
+        </div>
+    </div>
+
+    <div id="chat-screen">
+        <div id="chatMessages" style="height: 60vh; overflow-y: auto; margin-bottom: 10px;"></div>
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="msgInput" placeholder="رسالة سحرية...">
+            <button class="btn-gold" onclick="sendMagicMsg()">إرسال</button>
+        </div>
+    </div>
+
+    <div class="nav">
+        <span onclick="showTab('feed')">🏠</span>
+        <span onclick="showTab('chat')">💬</span>
+        <span onclick="logout()">🚪</span>
     </div>
 </div>
 
 <script>
-    // نظام الذاكرة المستمرة (Local Storage)
+    // 1. نظام الدخول والحفظ
     window.onload = function() {
         const savedUser = localStorage.getItem('people_user');
-        if (savedUser) {
-            showApp(savedUser);
-        }
+        if (savedUser) showApp(savedUser);
     }
 
     function saveLogin() {
         const user = document.getElementById('username').value;
-        const pass = document.getElementById('password').value;
-        
-        if (user && pass) {
+        if (user) {
             localStorage.setItem('people_user', user);
-            localStorage.setItem('people_pass', pass); // حفظ كلمة السر في ذاكرة المتصفح
             showApp(user);
-        } else {
-            alert("يرجى إدخال البيانات كاملة");
         }
     }
 
     function showApp(name) {
         document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-content').style.display = 'block';
+        document.getElementById('main-app').style.display = 'block';
         document.getElementById('user-display').innerText = name;
     }
 
-    function logout() {
-        localStorage.clear();
-        location.reload();
+    function logout() { localStorage.clear(); location.reload(); }
+
+    // 2. نظام الدردشة والفراشات
+    function sendMagicMsg() {
+        const input = document.getElementById('msgInput');
+        if (!input.value) return;
+        const m = document.createElement('div');
+        m.className = 'msg'; m.innerText = input.value;
+        document.getElementById('chatMessages').appendChild(m);
+        
+        const b = document.createElement('div');
+        b.className = 'butterfly'; b.innerHTML = '🦋';
+        b.style.left = Math.random() * 80 + '%'; b.style.bottom = '20px';
+        document.body.appendChild(b);
+
+        setTimeout(() => { b.style.bottom = '100vh'; b.style.opacity = '0'; }, 100);
+        setTimeout(() => { m.remove(); b.remove(); }, 5000);
+        input.value = "";
+    }
+
+    // 3. التفاعلات
+    function likePost(e) {
+        const h = document.createElement('span');
+        h.innerHTML = '⭐'; h.className = 'heart-pop';
+        h.style.left = e.pageX + 'px'; h.style.top = e.pageY + 'px';
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 600);
+    }
+
+    function showTab(tab) {
+        document.getElementById('feed').style.display = tab === 'feed' ? 'block' : 'none';
+        document.getElementById('chat-screen').style.display = tab === 'chat' ? 'block' : 'none';
     }
 </script>
 </body>
