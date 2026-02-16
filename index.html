@@ -1,125 +1,175 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إسماعيل غفة | Ismail Gaffa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>People | Golden Network</title>
     <style>
-        /* CSS - التصميم */
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --text-color: #333;
-            --bg-color: #f4f7f6;
-        }
+        :root { --gold: #d4af37; --bg: #000; --nav: #050505; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; height: 100vh; overflow: hidden; direction: rtl; display: flex; flex-direction: column; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* شاشة تسجيل الدخول */
+        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .login-input { width: 100%; max-width: 300px; padding: 15px; background: #111; border: 1px solid var(--gold); color: #fff; border-radius: 8px; margin-bottom: 20px; text-align: center; outline: none; }
 
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        /* الهيدر */
+        .header { height: 50px; display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid #222; color: var(--gold); font-weight: bold; flex-shrink: 0; background: var(--bg); }
 
-        .card {
-            background: #fff;
-            max-width: 500px;
-            width: 90%;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
+        /* المحتوى */
+        #main { flex: 1; overflow-y: auto; padding-bottom: 70px; }
+        .page { display: none; height: 100%; }
+        .active { display: block; }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
+        /* المنشورات */
+        .post { margin-bottom: 10px; border-bottom: 0.5px solid #111; }
+        .post-header { padding: 10px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .p-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); }
+        .p-img { width: 100%; aspect-ratio: 1/1; background: #050505; overflow: hidden; }
+        .p-img img { width: 100%; height: 100%; object-fit: cover; }
 
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid var(--primary-color);
-            margin-bottom: 20px;
-            object-fit: cover;
-        }
+        /* الدردشة السحرية */
+        #chatBox { display: flex; flex-direction: column; height: 100%; padding: 15px; }
+        .msg { padding: 10px 15px; border-radius: 20px; background: #1a1a1a; margin-bottom: 10px; align-self: flex-start; border: 0.5px solid var(--gold); animation: fadeOut 1s 10s forwards; }
+        .butterfly { position: absolute; pointer-events: none; animation: fly 10s linear forwards; }
+        @keyframes fly { to { transform: translateY(-100vh); opacity: 0; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-        h1 {
-            font-size: 1.8rem;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-        }
+        /* البروفايل */
+        .profile-top { padding: 20px; text-align: center; }
+        .stats { display: flex; justify-content: space-around; padding: 15px 0; border-top: 0.5px solid #222; border-bottom: 0.5px solid #222; margin: 15px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
 
-        .title {
-            color: var(--primary-color);
-            font-weight: bold;
-            margin-bottom: 20px;
-            display: block;
-        }
+        /* الأزرار السفلية */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: var(--nav); border-top: 0.5px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 5000; }
+        .nav-icon { cursor: pointer; filter: grayscale(1); transition: 0.3s; }
+        .nav-icon.active { filter: grayscale(0); transform: scale(1.1); }
 
-        .bio {
-            font-size: 1rem;
-            margin-bottom: 30px;
-            color: #666;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .social-links a {
-            text-decoration: none;
-            color: #fff;
-            background: var(--secondary-color);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            background: var(--primary-color);
-            transform: scale(1.05);
-        }
-
-        /* تحسينات للشاشات الصغيرة */
-        @media (max-width: 480px) {
-            .card { padding: 20px; }
-            .social-links { flex-direction: column; }
-        }
+        /* نافذة النشر */
+        #pubModal { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; flex-direction: column; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ismail" alt="Ismail Gaffa" class="profile-img">
-        
-        <h1>إسماعيل غفة</h1>
-        <span class="title">مطور ويب ورائد أعمال</span>
-        
-        <p class="bio">
-            مرحباً بك في مساحتي الخاصة! أنا شغوف ببناء الحلول الرقمية، وتطوير المواقع التي تجمع بين الأداء العالي والتصميم الجذاب. أسعى دائماً لتعلم كل ما هو جديد في عالم التقنية.
-        </p>
+<div id="loginOverlay">
+    <h1 style="color:var(--gold); font-size: 2.5rem; margin-bottom: 20px;">People</h1>
+    <input type="text" id="userInput" class="login-input" placeholder="اسم المستخدم الذهبي...">
+    <button onclick="doLogin()" style="width:100%; max-width:300px; padding:15px; background:var(--gold); border:none; border-radius:8px; font-weight:bold;">دخول</button>
+</div>
 
-        <div class="social-links">
-            <a href="https://github.com/Ismailgaffa-dotcom" target="_blank">GitHub</a>
-            <a href="#" target="_blank">LinkedIn</a>
-            <a href="mailto:your-email@example.com">تواصل معي</a>
+<div class="header" id="hTitle">People</div>
+
+<div id="main">
+    <div id="feed" class="page active">
+        <div id="feedItems"></div>
+    </div>
+
+    <div id="chat" class="page">
+        <div id="chatMessages" style="flex:1; overflow-y:auto;"></div>
+        <div style="display:flex; gap:10px; padding:10px; background:#000;">
+            <input type="text" id="msgInput" placeholder="رسالة ستختفي..." style="flex:1; background:#111; border:0.5px solid #333; color:#fff; padding:10px; border-radius:20px;">
+            <button onclick="sendMagicMsg()" style="color:var(--gold); font-weight:bold; background:none; border:none;">إرسال</button>
         </div>
     </div>
 
+    <div id="profile" class="page">
+        <div class="profile-top">
+            <div style="width:80px; height:80px; border-radius:50%; background:var(--gold); margin:0 auto 10px;"></div>
+            <h2 id="pName"></h2>
+            <div class="stats">
+                <div><b id="cPosts">0</b><br><small>منشورات</small></div>
+                <div><b>1.5K</b><br><small>متابعون</small></div>
+                <div><b>420</b><br><small>يتابع</small></div>
+            </div>
+            <div id="pGrid" class="grid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="pubModal">
+    <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
+        <span onclick="closePub()" style="font-size:25px;">✕</span>
+        <b style="color:var(--gold)">منشور جديد</b>
+        <span onclick="confirmPub()" style="color:var(--gold); font-weight:bold;">نشر</span>
+    </div>
+    <input type="file" id="imgFile" accept="image/*" style="margin-bottom:20px;">
+    <textarea id="caption" style="width:100%; background:#111; color:#fff; border:1px solid #333; padding:10px; height:100px;" placeholder="اكتب شيئاً..."></textarea>
+</div>
+
+<nav class="nav">
+    <div onclick="switchTab('feed', this)" class="nav-icon active" title="الرئيسية">🏠</div>
+    <div onclick="openPub()" style="color:var(--gold); font-size:35px; cursor:pointer;">+</div>
+    <div onclick="switchTab('chat', this)" class="nav-icon" title="دردشة">💬</div>
+    <div onclick="switchTab('profile', this)" class="nav-icon" title="حسابي">👤</div>
+</nav>
+
+<script>
+    let me = "";
+    let posts = 0;
+
+    function doLogin() {
+        me = document.getElementById('userInput').value;
+        if(me) {
+            document.getElementById('loginOverlay').style.display='none';
+            document.getElementById('pName').innerText = me;
+            document.getElementById('hTitle').innerText = "People | " + me;
+        }
+    }
+
+    function switchTab(id, el) {
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.querySelectorAll('.nav-icon').forEach(i=>i.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+        document.getElementById('hTitle').innerText = (id==='feed') ? "People" : (id==='chat') ? "دردشة سحرية" : "ملفي الشخصي";
+    }
+
+    function openPub() { document.getElementById('pubModal').style.display='flex'; }
+    function closePub() { document.getElementById('pubModal').style.display='none'; }
+
+    function confirmPub() {
+        const file = document.getElementById('imgFile').files[0];
+        const text = document.getElementById('caption').value;
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = e.target.result;
+                const p = document.createElement('div');
+                p.className='post';
+                p.innerHTML=`<div class="post-header"><div class="p-avatar"></div>${me}</div>
+                             <div class="p-img"><img src="${img}"></div>
+                             <div class="post-desc" style="padding:10px;"><b>${me}:</b> ${text}</div>`;
+                document.getElementById('feedItems').insertBefore(p, document.getElementById('feedItems').firstChild);
+                
+                const thumb = document.createElement('div');
+                thumb.style.aspectRatio="1/1";
+                thumb.innerHTML=`<img src="${img}" style="width:100%; height:100%; object-fit:cover;">`;
+                document.getElementById('pGrid').insertBefore(thumb, document.getElementById('pGrid').firstChild);
+                
+                posts++; document.getElementById('cPosts').innerText=posts;
+                closePub(); switchTab('feed', document.querySelector('.nav-icon'));
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function sendMagicMsg() {
+        const input = document.getElementById('msgInput');
+        if(input.value) {
+            const m = document.createElement('div');
+            m.className='msg'; m.innerText = input.value;
+            document.getElementById('chatMessages').appendChild(m);
+            
+            // الفراشة
+            const b = document.createElement('div');
+            b.className='butterfly'; b.innerHTML='🦋';
+            b.style.left = Math.random()*80+'%'; b.style.bottom='70px';
+            document.body.appendChild(b);
+            
+            setTimeout(()=> { m.remove(); b.remove(); }, 10000);
+            input.value="";
+        }
+    }
+</script>
 </body>
 </html>
