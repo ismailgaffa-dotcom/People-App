@@ -1,175 +1,108 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>People | Golden Network</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>People | Social Universe 🦋</title>
     <style>
-        :root { --gold: #d4af37; --bg: #000; --nav: #050505; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: #fff; font-family: -apple-system, sans-serif; height: 100vh; overflow: hidden; direction: rtl; display: flex; flex-direction: column; }
+        :root { --gold: #d4af37; --dark: #1a1a1a; --glass: rgba(255, 255, 255, 0.1); }
+        body { background: var(--dark); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* تأثير القلب الذهبي */
+        .heart-pop { position: absolute; color: var(--gold); animation: pop 0.6s ease-out; pointer-events: none; }
+        @keyframes pop { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
 
-        /* شاشة تسجيل الدخول */
-        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .login-input { width: 100%; max-width: 300px; padding: 15px; background: #111; border: 1px solid var(--gold); color: #fff; border-radius: 8px; margin-bottom: 20px; text-align: center; outline: none; }
+        /* الفراشة الذهبية المتوهجة */
+        .butterfly { 
+            position: fixed; font-size: 24px; pointer-events: none; z-index: 1000;
+            filter: drop-shadow(0 0 5px var(--gold));
+            transition: all 0.5s ease;
+        }
 
-        /* الهيدر */
-        .header { height: 50px; display: flex; align-items: center; justify-content: center; border-bottom: 0.5px solid #222; color: var(--gold); font-weight: bold; flex-shrink: 0; background: var(--bg); }
-
-        /* المحتوى */
-        #main { flex: 1; overflow-y: auto; padding-bottom: 70px; }
-        .page { display: none; height: 100%; }
-        .active { display: block; }
-
-        /* المنشورات */
-        .post { margin-bottom: 10px; border-bottom: 0.5px solid #111; }
-        .post-header { padding: 10px; display: flex; align-items: center; gap: 10px; font-weight: 600; }
-        .p-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); }
-        .p-img { width: 100%; aspect-ratio: 1/1; background: #050505; overflow: hidden; }
-        .p-img img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* الدردشة السحرية */
-        #chatBox { display: flex; flex-direction: column; height: 100%; padding: 15px; }
-        .msg { padding: 10px 15px; border-radius: 20px; background: #1a1a1a; margin-bottom: 10px; align-self: flex-start; border: 0.5px solid var(--gold); animation: fadeOut 1s 10s forwards; }
-        .butterfly { position: absolute; pointer-events: none; animation: fly 10s linear forwards; }
-        @keyframes fly { to { transform: translateY(-100vh); opacity: 0; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-
-        /* البروفايل */
-        .profile-top { padding: 20px; text-align: center; }
-        .stats { display: flex; justify-content: space-around; padding: 15px 0; border-top: 0.5px solid #222; border-bottom: 0.5px solid #222; margin: 15px 0; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
-
-        /* الأزرار السفلية */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: var(--nav); border-top: 0.5px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 5000; }
-        .nav-icon { cursor: pointer; filter: grayscale(1); transition: 0.3s; }
-        .nav-icon.active { filter: grayscale(0); transform: scale(1.1); }
-
-        /* نافذة النشر */
-        #pubModal { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; flex-direction: column; padding: 20px; }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #222; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--gold); }
+        .post-card { background: #222; margin: 10px; border-radius: 15px; overflow: hidden; border: 0.5px solid var(--glass); }
+        .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .post-actions { padding: 10px; display: flex; align-items: center; gap: 10px; }
+        
+        #chat-screen { padding: 20px; display: none; }
+        .msg { background: var(--gold); color: black; padding: 10px; border-radius: 15px; margin-bottom: 10px; align-self: flex-start; }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-    <h1 style="color:var(--gold); font-size: 2.5rem; margin-bottom: 20px;">People</h1>
-    <input type="text" id="userInput" class="login-input" placeholder="اسم المستخدم الذهبي...">
-    <button onclick="doLogin()" style="width:100%; max-width:300px; padding:15px; background:var(--gold); border:none; border-radius:8px; font-weight:bold;">دخول</button>
-</div>
-
-<div class="header" id="hTitle">People</div>
-
-<div id="main">
-    <div id="feed" class="page active">
-        <div id="feedItems"></div>
-    </div>
-
-    <div id="chat" class="page">
-        <div id="chatMessages" style="flex:1; overflow-y:auto;"></div>
-        <div style="display:flex; gap:10px; padding:10px; background:#000;">
-            <input type="text" id="msgInput" placeholder="رسالة ستختفي..." style="flex:1; background:#111; border:0.5px solid #333; color:#fff; padding:10px; border-radius:20px;">
-            <button onclick="sendMagicMsg()" style="color:var(--gold); font-weight:bold; background:none; border:none;">إرسال</button>
+<div id="feed">
+    <h2 style="text-align: center; color: var(--gold);">People 🦋</h2>
+    <div id="posts-container">
         </div>
-    </div>
+</div>
 
-    <div id="profile" class="page">
-        <div class="profile-top">
-            <div style="width:80px; height:80px; border-radius:50%; background:var(--gold); margin:0 auto 10px;"></div>
-            <h2 id="pName"></h2>
-            <div class="stats">
-                <div><b id="cPosts">0</b><br><small>منشورات</small></div>
-                <div><b>1.5K</b><br><small>متابعون</small></div>
-                <div><b>420</b><br><small>يتابع</small></div>
-            </div>
-            <div id="pGrid" class="grid"></div>
-        </div>
+<div id="chat-screen">
+    <h3 style="color: var(--gold);">المحادثة السحرية ✨</h3>
+    <div id="chatMessages" style="height: 70vh; overflow-y: auto;"></div>
+    <div style="display: flex; gap: 5px;">
+        <input type="text" id="msgInput" placeholder="اكتب رسالة ستختفي..." style="flex:1; padding: 10px; border-radius: 20px; border: none;">
+        <button onclick="sendMagicMsg()" style="background: var(--gold); border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold;">إرسال</button>
     </div>
 </div>
 
-<div id="pubModal">
-    <div style="display:flex; justify-content:space-between; margin-bottom:30px;">
-        <span onclick="closePub()" style="font-size:25px;">✕</span>
-        <b style="color:var(--gold)">منشور جديد</b>
-        <span onclick="confirmPub()" style="color:var(--gold); font-weight:bold;">نشر</span>
-    </div>
-    <input type="file" id="imgFile" accept="image/*" style="margin-bottom:20px;">
-    <textarea id="caption" style="width:100%; background:#111; color:#fff; border:1px solid #333; padding:10px; height:100px;" placeholder="اكتب شيئاً..."></textarea>
+<div class="nav">
+    <span onclick="showTab('feed')">🏠</span>
+    <span onclick="showTab('chat')">💬</span>
+    <span onclick="alert('قريباً: تعديل البروفايل الذهبي 👑')">👤</span>
 </div>
-
-<nav class="nav">
-    <div onclick="switchTab('feed', this)" class="nav-icon active" title="الرئيسية">🏠</div>
-    <div onclick="openPub()" style="color:var(--gold); font-size:35px; cursor:pointer;">+</div>
-    <div onclick="switchTab('chat', this)" class="nav-icon" title="دردشة">💬</div>
-    <div onclick="switchTab('profile', this)" class="nav-icon" title="حسابي">👤</div>
-</nav>
 
 <script>
-    let me = "";
-    let posts = 0;
-
-    function doLogin() {
-        me = document.getElementById('userInput').value;
-        if(me) {
-            document.getElementById('loginOverlay').style.display='none';
-            document.getElementById('pName').innerText = me;
-            document.getElementById('hTitle').innerText = "People | " + me;
-        }
-    }
-
-    function switchTab(id, el) {
-        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-        document.querySelectorAll('.nav-icon').forEach(i=>i.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-        document.getElementById('hTitle').innerText = (id==='feed') ? "People" : (id==='chat') ? "دردشة سحرية" : "ملفي الشخصي";
-    }
-
-    function openPub() { document.getElementById('pubModal').style.display='flex'; }
-    function closePub() { document.getElementById('pubModal').style.display='none'; }
-
-    function confirmPub() {
-        const file = document.getElementById('imgFile').files[0];
-        const text = document.getElementById('caption').value;
-        if(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = e.target.result;
-                const p = document.createElement('div');
-                p.className='post';
-                p.innerHTML=`<div class="post-header"><div class="p-avatar"></div>${me}</div>
-                             <div class="p-img"><img src="${img}"></div>
-                             <div class="post-desc" style="padding:10px;"><b>${me}:</b> ${text}</div>`;
-                document.getElementById('feedItems').insertBefore(p, document.getElementById('feedItems').firstChild);
-                
-                const thumb = document.createElement('div');
-                thumb.style.aspectRatio="1/1";
-                thumb.innerHTML=`<img src="${img}" style="width:100%; height:100%; object-fit:cover;">`;
-                document.getElementById('pGrid').insertBefore(thumb, document.getElementById('pGrid').firstChild);
-                
-                posts++; document.getElementById('cPosts').innerText=posts;
-                closePub(); switchTab('feed', document.querySelector('.nav-icon'));
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
+    // 1. نظام الفراشات المتطورة والرسائل المختفية
     function sendMagicMsg() {
         const input = document.getElementById('msgInput');
-        if(input.value) {
-            const m = document.createElement('div');
-            m.className='msg'; m.innerText = input.value;
-            document.getElementById('chatMessages').appendChild(m);
-            
-            // الفراشة
-            const b = document.createElement('div');
-            b.className='butterfly'; b.innerHTML='🦋';
-            b.style.left = Math.random()*80+'%'; b.style.bottom='70px';
-            document.body.appendChild(b);
-            
-            setTimeout(()=> { m.remove(); b.remove(); }, 10000);
-            input.value="";
-        }
+        if (!input.value) return;
+
+        const m = document.createElement('div');
+        m.className = 'msg';
+        m.innerText = input.value;
+        document.getElementById('chatMessages').appendChild(m);
+
+        // إنشاء الفراشة الذهبية
+        const b = document.createElement('div');
+        b.className = 'butterfly';
+        b.innerHTML = '🦋';
+        b.style.left = Math.random() * 80 + '%';
+        b.style.bottom = '20px';
+        document.body.appendChild(b);
+
+        // حركة الفراشة وتلاشي الرسالة
+        setTimeout(() => { b.style.bottom = '100vh'; b.style.opacity = '0'; }, 100);
+        setTimeout(() => { m.remove(); b.remove(); }, 5000); // تختفي بعد 5 ثوانٍ
+        
+        input.value = "";
     }
+
+    // 2. نظام القلوب الذهبية للمنشورات
+    function likePost(event) {
+        const heart = document.createElement('span');
+        heart.innerHTML = '⭐';
+        heart.className = 'heart-pop';
+        heart.style.left = event.pageX + 'px';
+        heart.style.top = event.pageY + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 600);
+    }
+
+    function showTab(tab) {
+        document.getElementById('feed').style.display = tab === 'feed' ? 'block' : 'none';
+        document.getElementById('chat-screen').style.display = tab === 'chat' ? 'block' : 'none';
+    }
+
+    // منشور تجريبي
+    const container = document.getElementById('posts-container');
+    container.innerHTML = `
+        <div class="post-card">
+            <img src="https://via.placeholder.com/400/d4af37/000000?text=Golden+Post" class="post-img">
+            <div class="post-actions">
+                <span onclick="likePost(event)" style="cursor:pointer; font-size: 20px;">⭐ إعجاب ذهبي</span>
+            </div>
+        </div>
+    `;
 </script>
 </body>
 </html>
